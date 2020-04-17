@@ -66,6 +66,11 @@ This command comes with a bunch of different options, please see below for each 
   * this shows some more information while running
 * --singular
   * this will create a singular titled model
+* --softdeletes
+ * this will include SoftDelete Class on model
+* --auditable
+ * this will include Auditable Class on model (base on git->http://www.laravel-auditing.com/docs/9.0/installation)
+ 
 
 ## Examples
 
@@ -97,6 +102,18 @@ php artisan generate:modelfromtable --connection=spark --all
 
 ```
 php artisan generate:modelfromtable --table=user --folder=app\Models
+```
+
+### Add SoftDelete class on model
+
+```
+php artisan generate:modelfromtable --table=user --softdeletes
+```
+
+### Add Auditable class on model
+
+```
+php artisan generate:modelfromtable --table=user --auditable
 ```
 
 ## License
