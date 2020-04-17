@@ -20,7 +20,7 @@
 ### Step 1: Install through Composer
 
 ```
-composer require "laracademy/generators" --dev
+composer require "gibasbr/modelgenerator" --dev
 ```
 
 ### Step 2: Artisan Command
