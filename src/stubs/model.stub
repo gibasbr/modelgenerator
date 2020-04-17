@@ -3,9 +3,15 @@
 namespace {{modelnamespace}};
 
 use Illuminate\Database\Eloquent\Model;
+{{useAuditable}}
+{{useSoftdeletes}}
 
-class {{class}} extends Model  
+
+class {{class}} extends Model {{implementsAuditable}}
 {
+
+    {{declareAuditable}}
+    {{declareSoftdeletes}}
 
     {{connection}}
 
