@@ -21,7 +21,9 @@ class ModelFromTableCommand extends Command
                             {--folder= : by default models are stored in app, but you can change that}
                             {--namespace= : by default the namespace that will be applied to all models is App}
                             {--singular : class name and class file name singular or plural}
-                            {--all : run for all tables}';
+                            {--all : run for all tables}
+                            {--auditable: Insert auditable use and declare}
+                            {--softdeletes: Insert softdeletes use and declare}';
 
     /**
      * The console command description.
@@ -57,6 +59,8 @@ class ModelFromTableCommand extends Command
             'debug'      => false,
             'all'        => false,
             'singular'   => '',
+            'auditable'  => false,
+            'softdeletes'=> false,
         ];
     }
 
@@ -143,6 +147,14 @@ class ModelFromTableCommand extends Command
 
             // figure out the connection
             $stub = $this->replaceConnection($stub, $this->options['connection']);
+
+            if($this->options['auditable']){
+                $stub = $this->replaceAuditable($stub);
+            }
+
+            if($this->options['softdeletes']){
+                $stub = $this->replaceSoftdeletes($stub);
+            }
 
             // writing stub out
             $this->doComment('Writing model: '.$fullPath, true);
@@ -247,17 +259,43 @@ class ModelFromTableCommand extends Command
     public function replaceConnection($stub, $database)
     {
         $replacementString = '/**
-     * The connection name for the model.
-     *
-     * @var string
-     */
-    protected $connection = \''.$database.'\';';
+        * The connection name for the model.
+        *
+        * @var string
+        */
+        protected $connection = \''.$database.'\';';
 
         if (strlen($database) <= 0) {
             $stub = str_replace('{{connection}}', '', $stub);
         } else {
             $stub = str_replace('{{connection}}', $replacementString, $stub);
         }
+
+        return $stub;
+    }
+
+    public function replaceAuditable($stub)
+    {
+        $useString = 'use OwenIt\Auditing\Contracts\Auditable;';
+        $implementsString='implements Auditable';
+        $declareString='use \OwenIt\Auditing\Auditable;';
+
+        $stub = str_replace('{{useAuditable}}', $useString, $stub);
+        $stub = str_replace('{{declareAuditable}}', $declareString, $stub);
+        $stub = str_replace('{{implementsAuditable}}', $implementsString, $stub);
+
+
+        return $stub;
+    }
+
+    public function replaceSoftdeletes($stub)
+    {
+        $useString = 'use Illuminate\Database\Eloquent\SoftDeletes;';
+        $declareString='use SoftDeletes;';
+
+        $stub = str_replace('{{useSoftdeletes}}', $useString, $stub);
+        $stub = str_replace('{{declareSoftdeletes}}', $declareString, $stub);
+
 
         return $stub;
     }
@@ -313,6 +351,13 @@ class ModelFromTableCommand extends Command
 
         // class name and class file name singular/plural
         $this->options['singular'] = ($this->option('singular')) ? $this->option('singular') : '';
+
+        // Auditable
+        $this->options['auditable'] = ($this->option('auditable')) ? true : false;
+
+        // Auditable
+        $this->options['softdeletes'] = ($this->option('softdeletes')) ? true : false;
+
     }
 
     /**
